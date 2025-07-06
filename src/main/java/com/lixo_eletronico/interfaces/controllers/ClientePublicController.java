@@ -19,17 +19,17 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/public/empresas")
-public class PublicEmpresaController {
+@RequestMapping("/public/clientes")
+public class ClientePublicController {
 	
-	private final IUsuarioService<CreateUsuarioEmpresaResponseDTO, CreateUsuarioEmpresaRequestDTO> usuarioService;
+	private final IUsuarioService<CreateUsuarioClienteResponseDTO, CreateUsuarioClienteRequestDTO> usuarioService;
 
-	public PublicEmpresaController(@Qualifier("empresaService") IUsuarioService<CreateUsuarioEmpresaResponseDTO, CreateUsuarioEmpresaRequestDTO> usuarioService) {
+	public ClientePublicController(@Qualifier("clienteService") IUsuarioService<CreateUsuarioClienteResponseDTO, CreateUsuarioClienteRequestDTO> usuarioService) {
 	    this.usuarioService = usuarioService;
 	}
 	
 	@PostMapping
-	public ResponseEntity<CreateUsuarioEmpresaResponseDTO> cadastrarCliente(@Valid @RequestBody CreateUsuarioEmpresaRequestDTO request) {
+	public ResponseEntity<CreateUsuarioClienteResponseDTO> cadastrarCliente(@Valid @RequestBody CreateUsuarioClienteRequestDTO request) {
 		var clienteCriado = usuarioService.cadastrarUsuario(request);
 		
 		return ResponseEntity.status(HttpStatus.CREATED).body(clienteCriado);

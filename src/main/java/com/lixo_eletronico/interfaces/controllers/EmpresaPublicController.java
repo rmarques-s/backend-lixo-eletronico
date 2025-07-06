@@ -12,8 +12,6 @@ import com.lixo_eletronico.infrastructure.services.ClienteService;
 import com.lixo_eletronico.infrastructure.services.interfaces.IUsuarioService;
 import com.lixo_eletronico.shared.dto.CreateUsuarioClienteRequestDTO;
 import com.lixo_eletronico.shared.dto.CreateUsuarioClienteResponseDTO;
-import com.lixo_eletronico.shared.dto.CreateUsuarioColetorRequestDTO;
-import com.lixo_eletronico.shared.dto.CreateUsuarioColetorResponseDTO;
 import com.lixo_eletronico.shared.dto.CreateUsuarioEmpresaRequestDTO;
 import com.lixo_eletronico.shared.dto.CreateUsuarioEmpresaResponseDTO;
 
@@ -21,17 +19,17 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/public/coletores")
-public class PublicColetorController {
+@RequestMapping("/public/empresas")
+public class EmpresaPublicController {
 	
-	private final IUsuarioService<CreateUsuarioColetorResponseDTO, CreateUsuarioColetorRequestDTO> usuarioService;
+	private final IUsuarioService<CreateUsuarioEmpresaResponseDTO, CreateUsuarioEmpresaRequestDTO> usuarioService;
 
-	public PublicColetorController(@Qualifier("coletorService") IUsuarioService<CreateUsuarioColetorResponseDTO, CreateUsuarioColetorRequestDTO> usuarioService) {
+	public EmpresaPublicController(@Qualifier("empresaService") IUsuarioService<CreateUsuarioEmpresaResponseDTO, CreateUsuarioEmpresaRequestDTO> usuarioService) {
 	    this.usuarioService = usuarioService;
 	}
 	
 	@PostMapping
-	public ResponseEntity<CreateUsuarioColetorResponseDTO> cadastrarCliente(@Valid @RequestBody CreateUsuarioColetorRequestDTO request) {
+	public ResponseEntity<CreateUsuarioEmpresaResponseDTO> cadastrarCliente(@Valid @RequestBody CreateUsuarioEmpresaRequestDTO request) {
 		var clienteCriado = usuarioService.cadastrarUsuario(request);
 		
 		return ResponseEntity.status(HttpStatus.CREATED).body(clienteCriado);

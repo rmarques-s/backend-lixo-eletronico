@@ -39,7 +39,7 @@ public class KeycloakAdminService {
     @Value("${keycloak.admin.target-realm}")
     private String targetRealm;
 
-    public void criarUsuario(UsuarioData usuarioData) {
+    public UsuarioData criarUsuario(UsuarioData usuarioData) {
         try (Keycloak keycloak = getKeycloakInstance()) {
             // 1. Criar representação do usuário
             UserRepresentation user = usuarioData.build();
@@ -68,6 +68,11 @@ public class KeycloakAdminService {
                     .roles()
                     .realmLevel()
                     .add(List.of(role));
+            
+            usuarioData.setKeycloakId(userId);
+            usuarioData.setCriado(true);
+            
+            return usuarioData;
         }
     }
 

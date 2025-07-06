@@ -13,6 +13,7 @@ import com.lixo_eletronico.shared.dto.CreateUsuarioColetorRequestDTO;
 import com.lixo_eletronico.shared.dto.CreateUsuarioColetorResponseDTO;
 import com.lixo_eletronico.shared.dto.CreateUsuarioEmpresaRequestDTO;
 import com.lixo_eletronico.shared.dto.CreateUsuarioEmpresaResponseDTO;
+import com.lixo_eletronico.shared.dto.DadosPerfilResponseDTO;
 
 import lombok.RequiredArgsConstructor;
 

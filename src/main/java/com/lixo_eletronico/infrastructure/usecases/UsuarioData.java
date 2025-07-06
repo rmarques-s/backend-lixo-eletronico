@@ -9,6 +9,8 @@ import org.keycloak.representations.idm.UserRepresentation;
 @NoArgsConstructor
 @AllArgsConstructor
 public abstract class UsuarioData {
+	private String keycloakId;
+	
 	private String role;
 	private String email;
 	private String senha;

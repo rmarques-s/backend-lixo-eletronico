@@ -10,6 +10,7 @@ import com.lixo_eletronico.shared.dto.CreateUsuarioClienteRequestDTO;
 import com.lixo_eletronico.shared.dto.CreateUsuarioClienteResponseDTO;
 import com.lixo_eletronico.shared.dto.CreateUsuarioEmpresaRequestDTO;
 import com.lixo_eletronico.shared.dto.CreateUsuarioEmpresaResponseDTO;
+import com.lixo_eletronico.shared.dto.DadosPerfilResponseDTO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -51,4 +52,5 @@ public class EmpresaService
 			throw e;
 		}
 	}
+
 }
