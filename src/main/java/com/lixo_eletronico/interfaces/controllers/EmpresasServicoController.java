@@ -47,7 +47,7 @@ public class EmpresasServicoController {
             @AuthenticationPrincipal Jwt jwt) {
 
         String empresaId = jwt.getSubject();
-        servicosService.atualizarStatusServico(empresaId, id, dto);
+        servicosService.atualizarStatus(empresaId, id, dto);
         return ResponseEntity.noContent().build();
     }
 }

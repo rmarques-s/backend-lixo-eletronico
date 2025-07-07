@@ -2,6 +2,7 @@ package com.lixo_eletronico.infrastructure.services;
 
 
 import com.lixo_eletronico.domain.entities.*;
+import com.lixo_eletronico.domain.enums.StatusServico;
 import com.lixo_eletronico.domain.repositories.*;
 import com.lixo_eletronico.shared.dto.*;
 
@@ -22,21 +23,44 @@ public class ClienteServicosService {
     private final PerfilUsuarioRepository perfilRepository;
     private final AgendamentoRepository agendamentoRepository;
     private final AvaliacaoRepository avaliacaoRepository;
+    private final ChatRepository chatRepository;
 
     public List<ServicoResponseDTO> listarServicosDisponiveis() {
         return servicoRepository.findAll().stream()
-                .filter(Servico::getStatus)
+                .filter(servico -> servico.getStatus() == StatusServico.ATIVO)
                 .map(ServicoResponseDTO::new)
                 .collect(Collectors.toList());
     }
 
-    public void iniciarChat(Long servicoId, String clienteId) {
-        // Simplesmente valida a existência
-        servicoRepository.findById(servicoId)
+    public ChatResponseDTO iniciarChat(Long servicoId, String clienteKeycloakId) {
+        var servico = servicoRepository.findById(servicoId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Serviço não encontrado"));
 
-        // Aqui você pode futuramente disparar um WebSocket ou gravar uma notificação
+        var cliente = perfilRepository.findByIdKeycloak(clienteKeycloakId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cliente não encontrado"));
+
+        var empresa = servico.getEmpresa();
+
+        // Verifica se já existe um chat entre este cliente e serviço
+        var chatExistente = chatRepository.findAll().stream()
+            .filter(c -> c.getCliente().equals(cliente) &&
+                         c.getServico().equals(servico))
+            .findFirst();
+
+        if (chatExistente.isPresent()) {
+            return new ChatResponseDTO(chatExistente.get().getId());
+        }
+
+        Chat chat = new Chat();
+        chat.setCliente(cliente);
+        chat.setEmpresa(empresa);
+        chat.setServico(servico);
+
+        chatRepository.save(chat);
+
+        return new ChatResponseDTO(chat.getId());
     }
+
 
     public void agendarServico(Long servicoId, String clienteId, AgendamentoRequestDTO dto) {
         var servico = servicoRepository.findById(servicoId)

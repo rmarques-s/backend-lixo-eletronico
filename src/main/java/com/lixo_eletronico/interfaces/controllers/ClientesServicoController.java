@@ -26,9 +26,13 @@ public class ClientesServicoController {
     }
 
     @PostMapping("/{id}/chat")
-    public ResponseEntity<Void> iniciarChat(@PathVariable Long id, @AuthenticationPrincipal Jwt jwt) {
-        servicosClienteService.iniciarChat(id, jwt.getSubject());
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+    public ResponseEntity<ChatResponseDTO> iniciarChat(
+            @PathVariable Long id,
+            @AuthenticationPrincipal Jwt jwt) {
+
+        String clienteId = jwt.getSubject();
+        var dto = servicosClienteService.iniciarChat(id, clienteId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(dto);
     }
 
     @PostMapping("/{id}/agendar")

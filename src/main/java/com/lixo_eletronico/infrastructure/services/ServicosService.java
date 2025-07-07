@@ -1,6 +1,7 @@
 package com.lixo_eletronico.infrastructure.services;
 
 import com.lixo_eletronico.domain.entities.Servico;
+import com.lixo_eletronico.domain.enums.StatusServico;
 import com.lixo_eletronico.domain.repositories.ServicoRepository;
 import com.lixo_eletronico.domain.repositories.PerfilUsuarioRepository;
 import com.lixo_eletronico.shared.dto.ServicoRequestDTO;
@@ -31,7 +32,7 @@ public class ServicosService {
         Servico servico = new Servico();
         servico.setTitulo(dto.getTitulo());
         servico.setDescricao(dto.getDescricao());
-        servico.setStatus(true); // serviço criado começa como ativo
+        servico.setStatus(StatusServico.ATIVO); // serviço criado começa como ativo
         servico.setEmpresa(perfilOp.get());
 
         return new ServicoResponseDTO(servicoRepository.save(servico));
@@ -43,9 +44,13 @@ public class ServicosService {
                 .collect(Collectors.toList());
     }
 
-    public void atualizarStatusServico(String empresaKeycloakId, Long id, AtualizarStatusServicoDTO dto) {
-        var servico = servicoRepository.findByIdAndEmpresa_IdKeycloak(id, empresaKeycloakId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Serviço não encontrado"));
+    public void atualizarStatus(String empresaKeycloakId, Long servicoId, AtualizarStatusServicoDTO dto) {
+        var servico = servicoRepository.findById(servicoId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Serviço não encontrado"));
+
+        if (!servico.getEmpresa().getIdKeycloak().equals(empresaKeycloakId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você não pode alterar esse serviço");
+        }
 
         servico.setStatus(dto.getStatus());
         servicoRepository.save(servico);

@@ -1,6 +1,8 @@
 package com.lixo_eletronico.domain.repositories;
 
 import com.lixo_eletronico.domain.entities.Servico;
+import com.lixo_eletronico.domain.enums.StatusServico;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

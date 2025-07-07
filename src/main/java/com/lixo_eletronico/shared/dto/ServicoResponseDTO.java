@@ -1,6 +1,8 @@
 package com.lixo_eletronico.shared.dto;
 
 import com.lixo_eletronico.domain.entities.Servico;
+import com.lixo_eletronico.domain.enums.StatusServico;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,7 +12,7 @@ public class ServicoResponseDTO {
     private Long id;
     private String titulo;
     private String descricao;
-    private Boolean status;
+    private StatusServico status;
     private String empresaNome;
 
     public ServicoResponseDTO(Servico servico) {
