@@ -13,6 +13,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,10 +40,10 @@ public class ClienteServicosService {
         var cliente = perfilRepository.findByIdKeycloak(clienteKeycloakId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cliente não encontrado"));
 
-        var empresa = servico.getEmpresa();
+        PerfilUsuario empresa = servico.getEmpresa();
 
         // Verifica se já existe um chat entre este cliente e serviço
-        var chatExistente = chatRepository.findAll().stream()
+        Optional<Chat> chatExistente = chatRepository.findAll().stream()
             .filter(c -> c.getCliente().equals(cliente) &&
                          c.getServico().equals(servico))
             .findFirst();
