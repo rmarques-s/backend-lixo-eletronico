@@ -1,0 +1,102 @@
+package com.lixo_eletronico.infrastructure.services;
+
+
+import com.lixo_eletronico.domain.entities.*;
+import com.lixo_eletronico.domain.repositories.*;
+import com.lixo_eletronico.shared.dto.*;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+public class ClienteServicosService {
+
+    private final ServicoRepository servicoRepository;
+    private final PerfilUsuarioRepository perfilRepository;
+    private final AgendamentoRepository agendamentoRepository;
+    private final AvaliacaoRepository avaliacaoRepository;
+
+    public List<ServicoResponseDTO> listarServicosDisponiveis() {
+        return servicoRepository.findAll().stream()
+                .filter(Servico::getStatus)
+                .map(ServicoResponseDTO::new)
+                .collect(Collectors.toList());
+    }
+
+    public void iniciarChat(Long servicoId, String clienteId) {
+        // Simplesmente valida a existência
+        servicoRepository.findById(servicoId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Serviço não encontrado"));
+
+        // Aqui você pode futuramente disparar um WebSocket ou gravar uma notificação
+    }
+
+    public void agendarServico(Long servicoId, String clienteId, AgendamentoRequestDTO dto) {
+        var servico = servicoRepository.findById(servicoId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Serviço não encontrado"));
+
+        var cliente = perfilRepository.findByIdKeycloak(clienteId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cliente não encontrado"));
+
+        boolean jaAgendado = agendamentoRepository
+            .findByServicoIdAndCliente_IdKeycloakAndCanceladoFalse(servicoId, clienteId)
+            .isPresent();
+
+        if (jaAgendado) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Você já agendou este serviço.");
+        }
+
+        if (dto.getDataAgendada() == null || dto.getDataAgendada().isBefore(LocalDateTime.now())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A data de agendamento deve ser futura.");
+        }
+
+        Agendamento agendamento = new Agendamento();
+        agendamento.setServico(servico);
+        agendamento.setCliente(cliente);
+        agendamento.setDataAgendada(dto.getDataAgendada());
+        agendamento.setCancelado(false);
+
+        agendamentoRepository.save(agendamento);
+    }
+
+    public void cancelarAgendamento(Long servicoId, String clienteId) {
+        var agendamento = agendamentoRepository
+            .findByServicoIdAndCliente_IdKeycloakAndCanceladoFalse(servicoId, clienteId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Agendamento não encontrado"));
+
+        agendamento.setCancelado(true);
+        agendamentoRepository.save(agendamento);
+    }
+
+    public void avaliarServico(Long servicoId, String clienteId, AvaliacaoServicoDTO dto) {
+        var servico = servicoRepository.findById(servicoId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Serviço não encontrado"));
+
+        var cliente = perfilRepository.findByIdKeycloak(clienteId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cliente não encontrado"));
+
+        boolean jaAvaliou = avaliacaoRepository.existsByServicoIdAndCliente_IdKeycloak(servicoId, clienteId);
+        if (jaAvaliou) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Você já avaliou este serviço.");
+        }
+
+        if (dto.getNota() < 1 || dto.getNota() > 5) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nota deve ser entre 1 e 5.");
+        }
+
+        Avaliacao avaliacao = new Avaliacao();
+        avaliacao.setServico(servico);
+        avaliacao.setCliente(cliente);
+        avaliacao.setNota(dto.getNota());
+        avaliacao.setComentario(dto.getComentario());
+
+        avaliacaoRepository.save(avaliacao);
+    }
+}

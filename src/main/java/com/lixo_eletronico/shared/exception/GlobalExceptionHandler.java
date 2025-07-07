@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.lang.reflect.Field;
@@ -39,6 +40,18 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
+	
+	@ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<?> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException ex) {
+        Map<String, Object> error = new HashMap<>();
+        error.put("error", "Bad Request");
+        error.put("message", "Método não suportaso: " + ex.getMessage());
+        error.put("timestamp", LocalDateTime.now());
+        error.put("status", 400);
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+	
 	
 	@ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<?> handleResponseStatusException(ResponseStatusException ex) {
