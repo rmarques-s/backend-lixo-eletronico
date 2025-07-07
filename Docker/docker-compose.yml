@@ -59,19 +59,19 @@ services:
       - app_network
     command: start-dev --import-realm
 
-  # app:
-  #   build:
-  #     context: ../  # Sobe um nível para acessar a raiz do projeto
-  #     dockerfile: Docker/Dockerfile  # Caminho relativo ao contexto
-  #   container_name: springboot_app
-  #   depends_on:
-  #     - app-db
-  #   ports:
-  #     - "8080:8080"
-  #   networks:
-  #     - app_network
-  #   environment:
-  #     - SPRING_PROFILES_ACTIVE=docker
+  app:
+    build:
+      context: ../  # Sobe um nível para acessar a raiz do projeto
+      dockerfile: Docker/Dockerfile  # Caminho relativo ao contexto
+    container_name: springboot_app
+    depends_on:
+      - app-db
+    ports:
+      - "8080:8080"
+    networks:
+      - app_network
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
 
 volumes:
   app_data:
